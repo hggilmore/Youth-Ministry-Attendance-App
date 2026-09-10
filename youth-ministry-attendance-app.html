@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>Mt. Zion Baptist Church Youth Ministry Attendance App</title>
+<style>
+  :root{
+    --ink:#10152b;
+    --ink-soft:#3f3f3f;
+    --paper:#f6f2f8;
+    --card:#ffffff;
+    --line:#e0d9e4;
+    --gold:#0086ff;
+    --gold-deep:#410942;
+    --navy:#10152b;
+    --navy-deep:#410942;
+    --lavender:#e9bff5;
+    --good:#3f7d54;
+    --warn:#a95d4d;
+    --radius:10px;
+  }
+  html{
+    color-scheme:light;
+    background:#f6f2f8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:640px;margin:0 auto;padding:18px 16px 60px;}
+
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  header.top h1{
+    font-size:1.3rem;
+    margin:0;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  header.top .sub{font-size:0.78rem;color:var(--ink-soft);}
+
+  .group-tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .group-tab{
+    flex:1;
+    text-align:center;
+    padding:11px 8px;
+    border-radius:var(--radius);
+    background:var(--card);
+    border:1px solid var(--line);
+    font-weight:600;
+    font-size:0.88rem;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .group-tab.active{
+    background:#ffffff;
+    color:var(--navy);
+    border-color:var(--gold);
+    box-shadow:0 0 0 2px var(--gold) inset;
+  }
+
+  .subnav{
+    display:flex;
+    border-bottom:1px solid var(--line);
+    margin-bottom:16px;
+  }
+  .subnav button{
+    flex:1;
+    padding:10px 4px;
+    background:none;
+    border:none;
+    border-bottom:2px solid transparent;
+    font-size:0.84rem;
+    font-weight:600;
+    color:#8a8a8a;
+    cursor:pointer;
+  }
+  .subnav button.active{
+    color:var(--gold);
+    border-bottom-color:var(--gold);
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .card .hint{font-size:0.74rem;color:var(--ink-soft);margin-top:6px;}
+
+  label.field-label{
+    display:block;
+    font-size:0.76rem;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+    font-weight:600;
+  }
+  input[type="date"], input[type="text"]{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:0.95rem;
+    background:#fff;
+    color:var(--ink);
+  }
+  .row-inline{display:flex;gap:8px;align-items:center;}
+  .row-inline input[type="text"]{flex:1;}
+
+  button.btn{
+    padding:10px 14px;
+    border-radius:8px;
+    border:none;
+    font-weight:700;
+    font-size:0.88rem;
+    cursor:pointer;
+  }
+  button.btn.primary{background:var(--navy);color:#fff;}
+  button.btn.gold{background:var(--gold);color:#ffffff;}
+  button.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink-soft);}
+  button.btn.danger{background:none;color:var(--warn);border:1px solid var(--warn);}
+  button.btn:disabled{opacity:0.45;cursor:default;}
+  button.btn.small{padding:6px 10px;font-size:0.78rem;}
+  button.btn.full{width:100%;margin-top:10px;}
+
+  .person-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 2px;
+    border-bottom:1px solid var(--line);
+    gap:10px;
+  }
+  .person-row:last-child{border-bottom:none;}
+  .person-name{font-weight:600;font-size:0.92rem;}
+  .person-meta{font-size:0.72rem;color:var(--ink-soft);margin-top:1px;}
+  .badge-row{display:flex;gap:4px;margin-top:3px;}
+  .badge{
+    font-size:0.62rem;
+    font-weight:700;
+    padding:2px 6px;
+    border-radius:10px;
+    background:var(--line);
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .badge.on{background:var(--lavender);color:var(--gold-deep);}
+
+  .check-toggle{
+    width:26px;height:26px;
+    border-radius:50%;
+    border:2px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .check-toggle.present{background:var(--good);border-color:var(--good);}
+  .check-toggle.present::after{content:"✓";color:#fff;font-size:0.85rem;font-weight:700;}
+
+  .empty{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:0.85rem;
+    padding:22px 10px;
+  }
+
+  table.report{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  table.report th{
+    text-align:left;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    text-transform:none;
+    padding:6px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  table.report td{
+    padding:8px 4px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  .pct-bar-wrap{
+    background:var(--line);
+    border-radius:6px;
+    height:8px;
+    width:60px;
+    overflow:hidden;
+    display:inline-block;
+    vertical-align:middle;
+    margin-right:6px;
+  }
+  .pct-bar{height:100%;background:var(--gold);}
+  .pct-num{font-weight:700;font-size:0.82rem;}
+
+  .toast{
+    position:fixed;
+    bottom:18px;left:50%;
+    transform:translateX(-50%);
+    background:var(--navy-deep);
+    color:#fff;
+    padding:9px 16px;
+    border-radius:20px;
+    font-size:0.82rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+  }
+  .toast.show{opacity:1;}
+
+  .summary-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .summary-line strong{color:var(--ink);}
+
+  .checkbox-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.85rem;
+    margin-top:8px;
+  }
+  .version-tag{
+    text-align:center;
+    font-size:0.65rem;
+    color:var(--ink-soft);
+    opacity:0.7;
+    margin-top:18px;
+  }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(16,21,43,0.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .modal-box{
+    background:#fff;
+    border-radius:var(--radius);
+    padding:18px;
+    max-width:360px;
+    width:100%;
+  }
+  .modal-box p{
+    font-size:0.9rem;
+    color:var(--ink);
+    margin:0 0 14px;
+    line-height:1.4;
+  }
+  .modal-actions{display:flex;gap:8px;}
+  .modal-actions .btn{flex:1;}
+</style>
+</head>
+<body>
+<div class="app" id="app">Loading…</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const JSONBIN_BIN_ID = "6aa3146dac6210605abe231b";
+const JSONBIN_ACCESS_KEY = "$2a$10$VkBH0B761J44UBeT4oHlrOCBVhgbLnxDqXy2k6Xx5AgUKpvIWL8Q2";
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const APP_VERSION = "2.0.0";
+const GROUP_LABELS = { youth: "Youth Church", wnl: "Wednesday Night Live" };
+
+let data = null;
+let state = {
+  group: "youth",
+  tab: "take", // take | roster | report
+  takeDate: todayStr(),
+  reportDate: todayStr(),
+  reportRun: false,
+  quickAddName: "",
+  quickAddBoth: true,
+  newPersonName: "",
+  newPersonDate: todayStr(),
+  newPersonYouth: true,
+  newPersonWnl: true,
+  confirmModal: null, // { message, actionType, actionArg }
+  unlocked: false,
+  pinScreen: 'loading', // 'enter' | 'setup' | null
+  pinInput: "",
+  pinInput2: "",
+  pinError: ""
+};
+
+function todayStr(){
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off*60000);
+  return local.toISOString().slice(0,10);
+}
+
+function emptyData(){
+  return { people: [], youth: { sessions: [] }, wnl: { sessions: [] } };
+}
+
+async function loadData(){
+  try{
+    const res = await fetch(`${JSONBIN_URL}/latest`, {
+      headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if(res.ok){
+      const json = await res.json();
+      data = (json && json.people) ? json : emptyData();
+    } else {
+      data = emptyData();
+    }
+  }catch(e){
+    data = emptyData();
+  }
+  migrate();
+  state.pinScreen = data.pin ? 'enter' : 'setup';
+  render();
+}
+
+// Migrate from the old per-group-roster format to a shared people list.
+function migrate(){
+  if(!data.people){
+    const fresh = emptyData();
+    const byName = {};
+    ['youth','wnl'].forEach(gk => {
+      const old = data[gk];
+      if(old && Array.isArray(old.roster)){
+        old.roster.forEach(p => {
+          let person = byName[p.name];
+          if(!person){
+            person = { id: p.id, name: p.name, startDate: p.startDate, groups: { youth:false, wnl:false } };
+            byName[p.name] = person;
+            fresh.people.push(person);
+          } else if(p.startDate < person.startDate){
+            person.startDate = p.startDate;
+          }
+          person.groups[gk] = true;
+        });
+      }
+      if(old && Array.isArray(old.sessions)){
+        fresh[gk].sessions = old.sessions;
+      }
+    });
+    data = fresh;
+  }
+  data.people.forEach(p => {
+    if(!p.groups) p.groups = { youth:true, wnl:true };
+  });
+  if(!data.youth) data.youth = { sessions: [] };
+  if(!data.wnl) data.wnl = { sessions: [] };
+}
+
+async function saveData(){
+  try{
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Access-Key': JSONBIN_ACCESS_KEY },
+      body: JSON.stringify(data)
+    });
+    if(!res.ok){ showToast("Couldn't save — try again"); }
+  }catch(e){
+    showToast("Couldn't save — try again");
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1600);
+}
+
+function uid(){ return 'p' + Math.random().toString(36).slice(2,9); }
+
+function peopleInGroup(gk){
+  return data.people.filter(p => p.groups[gk]);
+}
+
+function findSession(gk, date){
+  return data[gk].sessions.find(s => s.date === date);
+}
+
+function togglePresent(personId){
+  const gk = state.group;
+  let session = findSession(gk, state.takeDate);
+  if(!session){
+    session = { date: state.takeDate, present: [] };
+    data[gk].sessions.push(session);
+  }
+  const idx = session.present.indexOf(personId);
+  if(idx >= 0) session.present.splice(idx,1);
+  else session.present.push(personId);
+  render();
+}
+
+async function saveAttendance(){
+  await saveData();
+  showToast("Attendance saved for " + fmtDate(state.takeDate));
+  render();
+}
+
+function addQuickPerson(){
+  const name = state.quickAddName.trim();
+  if(!name) return;
+  const groups = { youth: false, wnl: false };
+  groups[state.group] = true;
+  if(state.quickAddBoth) groups.youth = groups.wnl = true;
+  const person = { id: uid(), name, startDate: state.takeDate, groups };
+  data.people.push(person);
+  let session = findSession(state.group, state.takeDate);
+  if(!session){
+    session = { date: state.takeDate, present: [] };
+    data[state.group].sessions.push(session);
+  }
+  session.present.push(person.id);
+  state.quickAddName = "";
+  render();
+}
+
+function addRosterPerson(){
+  const name = state.newPersonName.trim();
+  if(!name) return;
+  const groups = { youth: state.newPersonYouth, wnl: state.newPersonWnl };
+  if(!groups.youth && !groups.wnl){ showToast("Pick at least one group"); return; }
+  data.people.push({ id: uid(), name, startDate: state.newPersonDate, groups });
+  state.newPersonName = "";
+  saveData();
+  render();
+}
+
+function removePerson(personId){
+  const p = data.people.find(p => p.id === personId);
+  askConfirm(
+    `Remove ${p ? p.name : 'this person'} entirely? Their past attendance history stays in past reports, but they'll drop off both rosters.`,
+    'remove', personId
+  );
+}
+
+function updateStartDate(personId, newDate){
+  const p = data.people.find(p => p.id === personId);
+  if(p){ p.startDate = newDate; saveData(); }
+}
+
+function toggleMembership(personId, gk){
+  const p = data.people.find(p => p.id === personId);
+  if(p){ p.groups[gk] = !p.groups[gk]; saveData(); render(); }
+}
+
+function fmtDate(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return dt.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+}
+
+function computeReport(gk){
+  const reportDate = state.reportDate;
+  const sessionsInRange = data[gk].sessions.filter(s => s.date <= reportDate);
+  return peopleInGroup(gk).map(p => {
+    const eligible = sessionsInRange.filter(s => s.date >= p.startDate);
+    const held = eligible.length;
+    const present = eligible.filter(s => s.present.includes(p.id)).length;
+    const pct = held > 0 ? Math.round((present/held)*100) : null;
+    return { ...p, held, present, pct };
+  }).sort((a,b) => {
+    if(a.pct === null) return 1;
+    if(b.pct === null) return -1;
+    return b.pct - a.pct;
+  });
+}
+
+function submitPinEnter(){
+  if(state.pinInput.length < 4){ state.pinError = "Enter all 4 digits"; render(); return; }
+  if(state.pinInput === data.pin){
+    state.unlocked = true;
+    state.pinScreen = null;
+    state.pinInput = "";
+    state.pinError = "";
+  } else {
+    state.pinError = "Incorrect PIN";
+    state.pinInput = "";
+  }
+  render();
+}
+
+function startPinReset(){
+  state.pinScreen = 'setup';
+  state.pinInput = "";
+  state.pinInput2 = "";
+  state.pinError = "";
+  render();
+}
+
+function cancelPinReset(){
+  state.pinScreen = 'enter';
+  state.pinInput = "";
+  state.pinInput2 = "";
+  state.pinError = "";
+  render();
+}
+
+function submitPinSetup(){
+  if(state.pinInput.length < 4 || state.pinInput2.length < 4){
+    state.pinError = "Enter 4 digits in both fields";
+    render(); return;
+  }
+  if(state.pinInput !== state.pinInput2){
+    state.pinError = "PINs don't match";
+    state.pinInput2 = "";
+    render(); return;
+  }
+  data.pin = state.pinInput;
+  saveData();
+  state.unlocked = true;
+  state.pinScreen = null;
+  state.pinInput = "";
+  state.pinInput2 = "";
+  state.pinError = "";
+  render();
+}
+
+function lockApp(){
+  state.unlocked = false;
+  state.pinScreen = 'enter';
+  state.pinInput = "";
+  render();
+}
+
+function render(){
+  const app = document.getElementById('app');
+
+  if(!state.unlocked){
+    let lockHtml;
+    if(state.pinScreen === 'setup'){
+      lockHtml = `
+        <div class="card" style="margin-top:60px;">
+          <h1 style="margin:0 0 4px;font-size:1.1rem;">Set a PIN</h1>
+          <p class="hint" style="margin-bottom:12px;">${data.pin ? "This replaces the current PIN for everyone using this link." : "Anyone opening this link will need this PIN."}</p>
+          <label class="field-label">New PIN (4 digits)</label>
+          <input type="text" inputmode="numeric" maxlength="4" value="${state.pinInput}" oninput="state.pinInput=this.value.replace(/[^0-9]/g,'').slice(0,4)">
+          <label class="field-label" style="margin-top:8px;">Confirm PIN</label>
+          <input type="text" inputmode="numeric" maxlength="4" value="${state.pinInput2}" oninput="state.pinInput2=this.value.replace(/[^0-9]/g,'').slice(0,4)">
+          ${state.pinError ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:6px;">${escapeHtml(state.pinError)}</div>` : ''}
+          <button class="btn primary full" onclick="submitPinSetup()">Save PIN</button>
+          ${data.pin ? `<button class="btn ghost full" onclick="cancelPinReset()" style="margin-top:8px;">Cancel</button>` : ''}
+        </div>
+      `;
+    } else {
+      lockHtml = `
+        <div class="card" style="margin-top:60px;">
+          <h1 style="margin:0 0 4px;font-size:1.1rem;">Enter PIN</h1>
+          <p class="hint" style="margin-bottom:12px;">Enter the shared PIN to open the Youth Ministry Attendance App.</p>
+          <input type="text" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" value="${state.pinInput}" oninput="state.pinInput=this.value.replace(/[^0-9]/g,'').slice(0,4)">
+          ${state.pinError ? `<div style="color:var(--warn);font-size:0.8rem;margin-top:6px;">${escapeHtml(state.pinError)}</div>` : ''}
+          <button class="btn primary full" onclick="submitPinEnter()">Unlock</button>
+          <button class="btn ghost full" onclick="startPinReset()" style="margin-top:8px;">Forgot PIN? Reset it</button>
+        </div>
+      `;
+    }
+    app.innerHTML = lockHtml;
+    return;
+  }
+
+  const gk = state.group;
+  const roster = peopleInGroup(gk);
+
+  let html = `
+    <header class="top">
+      <div>
+        <h1>Mt. Zion Baptist Church</h1>
+        <div class="sub">Youth Ministry Attendance App — ${GROUP_LABELS[gk]}</div>
+      </div>
+      <button class="btn ghost small" onclick="lockApp()">🔒 Lock</button>
+    </header>
+    <div class="group-tabs">
+      <div class="group-tab ${gk==='youth'?'active':''}" onclick="setGroup('youth')">Youth Church</div>
+      <div class="group-tab ${gk==='wnl'?'active':''}" onclick="setGroup('wnl')">Wed Night Live</div>
+    </div>
+    <div class="subnav">
+      <button class="${state.tab==='take'?'active':''}" onclick="setTab('take')">Take Attendance</button>
+      <button class="${state.tab==='roster'?'active':''}" onclick="setTab('roster')">Roster</button>
+      <button class="${state.tab==='report'?'active':''}" onclick="setTab('report')">Report</button>
+    </div>
+  `;
+
+  if(state.tab === 'take'){
+    const session = findSession(gk, state.takeDate);
+    const presentSet = session ? session.present : [];
+    html += `
+      <div class="card">
+        <label class="field-label">Meeting date</label>
+        <input type="date" value="${state.takeDate}" onchange="setTakeDate(this.value)">
+      </div>
+      <div class="card">
+        <label class="field-label">Add a visitor / new person</label>
+        <div class="row-inline">
+          <input type="text" id="quickAddInput" placeholder="Name" value="${escapeAttr(state.quickAddName)}" onchange="state.quickAddName=this.value">
+          <button class="btn gold" onclick="captureQuickAdd()">Add</button>
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="quickBoth" ${state.quickAddBoth?'checked':''} onchange="state.quickAddBoth=this.checked">
+          <label for="quickBoth">Also add to ${GROUP_LABELS[gk==='youth'?'wnl':'youth']}</label>
+        </div>
+      </div>
+      <div class="card">
+        ${roster.length === 0 ? `<div class="empty">No one on this roster yet. Add someone above.</div>` :
+        roster.map(p => `
+          <div class="person-row">
+            <div>
+              <div class="person-name">${escapeHtml(p.name)}</div>
+              <div class="person-meta">tracked since ${fmtDate(p.startDate)}</div>
+            </div>
+            <div class="check-toggle ${presentSet.includes(p.id)?'present':''}" onclick="togglePresent('${p.id}')"></div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn primary full" onclick="saveAttendance()">Save attendance for ${fmtDate(state.takeDate)}</button>
+    `;
+  }
+
+  if(state.tab === 'roster'){
+    html += `
+      <div class="card">
+        <label class="field-label">Add a person (one entry, pick their groups)</label>
+        <input type="text" placeholder="Name" value="${escapeAttr(state.newPersonName)}" onchange="state.newPersonName=this.value" style="margin-bottom:8px;">
+        <label class="field-label">Start date</label>
+        <input type="date" value="${state.newPersonDate}" onchange="state.newPersonDate=this.value">
+        <div class="checkbox-line">
+          <input type="checkbox" id="npYouth" ${state.newPersonYouth?'checked':''} onchange="state.newPersonYouth=this.checked">
+          <label for="npYouth">Youth Church</label>
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="npWnl" ${state.newPersonWnl?'checked':''} onchange="state.newPersonWnl=this.checked">
+          <label for="npWnl">Wednesday Night Live</label>
+        </div>
+        <button class="btn gold full" onclick="addRosterPerson()">Add person</button>
+      </div>
+      <div class="card">
+        <div class="hint" style="margin-bottom:6px;">Everyone below — tap a badge to add or remove them from a group.</div>
+        ${data.people.length === 0 ? `<div class="empty">No one added yet.</div>` :
+        data.people.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p => `
+          <div class="person-row">
+            <div style="flex:1;">
+              <div class="person-name">${escapeHtml(p.name)}</div>
+              <div class="person-meta">
+                start date:
+                <input type="date" value="${p.startDate}" style="display:inline-block;width:auto;padding:2px 6px;font-size:0.72rem;margin-left:4px;" onchange="updateStartDate('${p.id}', this.value)">
+              </div>
+              <div class="badge-row">
+                <span class="badge ${p.groups.youth?'on':''}" onclick="toggleMembership('${p.id}','youth')">Youth</span>
+                <span class="badge ${p.groups.wnl?'on':''}" onclick="toggleMembership('${p.id}','wnl')">WNL</span>
+              </div>
+            </div>
+            <button class="btn danger small" onclick="removePerson('${p.id}')">Remove</button>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card" style="text-align:center;">
+        <button class="btn ghost small" onclick="exportRosterCSV()">Export roster (CSV)</button>
+        <button class="btn ghost small" onclick="exportHistoryCSV()" style="margin-left:8px;">Export full history (CSV)</button>
+      </div>
+      <div class="card" style="text-align:center;">
+        <button class="btn ghost small" onclick="resetAllData()">Reset all data</button>
+      </div>
+    `;
+  }
+
+  if(state.tab === 'report'){
+    html += `
+      <div class="card">
+        <label class="field-label">Report as of</label>
+        <input type="date" value="${state.reportDate}" onchange="setReportDate(this.value)">
+        <button class="btn gold full" onclick="runReport()">Generate report</button>
+      </div>
+    `;
+    if(state.reportRun){
+      const rows = computeReport(gk);
+      const withPct = rows.filter(r => r.pct !== null);
+      const avg = withPct.length ? Math.round(withPct.reduce((s,r)=>s+r.pct,0)/withPct.length) : null;
+      html += `
+        <div class="card">
+          <div class="summary-line">
+            <span>${rows.length} people tracked</span>
+            <span>Group average: <strong>${avg !== null ? avg+'%' : '—'}</strong></span>
+          </div>
+          <button class="btn ghost small full" onclick="exportReportCSV()" style="margin-bottom:10px;">Download this report (CSV)</button>
+          ${rows.length === 0 ? `<div class="empty">Nothing to report yet.</div>` : `
+          <table class="report">
+            <thead><tr><th>Name</th><th>Held</th><th>Present</th><th>Attendance</th></tr></thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.name)}</td>
+                  <td>${r.held}</td>
+                  <td>${r.present}</td>
+                  <td>
+                    ${r.pct === null ? '<span class="person-meta">no sessions yet</span>' : `
+                      <span class="pct-bar-wrap"><span class="pct-bar" style="width:${r.pct}%;"></span></span>
+                      <span class="pct-num">${r.pct}%</span>
+                    `}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+      `;
+    }
+  }
+
+  if(state.confirmModal){
+    html += `
+      <div class="modal-overlay" onclick="if(event.target===this) cancelConfirm()">
+        <div class="modal-box">
+          <p>${escapeHtml(state.confirmModal.message)}</p>
+          <div class="modal-actions">
+            <button class="btn ghost" onclick="cancelConfirm()">Cancel</button>
+            <button class="btn primary" onclick="confirmYes()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `<div class="version-tag">v${APP_VERSION}</div>`;
+
+  app.innerHTML = html;
+}
+
+function csvEscape(val){
+  const s = String(val ?? '');
+  if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+
+function downloadCSV(filename, csvContent){
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast("Download started");
+}
+
+function exportReportCSV(){
+  const gk = state.group;
+  const rows = computeReport(gk);
+  let csv = 'Name,Held,Present,Attendance %\n';
+  rows.forEach(r => {
+    csv += [csvEscape(r.name), r.held, r.present, r.pct === null ? '' : r.pct].join(',') + '\n';
+  });
+  downloadCSV(`${GROUP_LABELS[gk].replace(/\s+/g,'_')}_report_${state.reportDate}.csv`, csv);
+}
+
+function exportRosterCSV(){
+  let csv = 'Name,Start Date,Youth Church,Wednesday Night Live\n';
+  data.people.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(p => {
+    csv += [csvEscape(p.name), p.startDate, p.groups.youth ? 'Yes':'No', p.groups.wnl ? 'Yes':'No'].join(',') + '\n';
+  });
+  downloadCSV('roster.csv', csv);
+}
+
+function exportHistoryCSV(){
+  let csv = 'Group,Date,Name,Present\n';
+  ['youth','wnl'].forEach(gk => {
+    data[gk].sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s => {
+      peopleInGroup(gk).forEach(p => {
+        if(p.startDate <= s.date){
+          csv += [GROUP_LABELS[gk], s.date, csvEscape(p.name), s.present.includes(p.id) ? 'Yes':'No'].join(',') + '\n';
+        }
+      });
+    });
+  });
+  downloadCSV('attendance_history.csv', csv);
+}
+
+function askConfirm(message, actionType, actionArg){
+  state.confirmModal = { message, actionType, actionArg };
+  render();
+}
+
+function cancelConfirm(){
+  state.confirmModal = null;
+  render();
+}
+
+function confirmYes(){
+  const m = state.confirmModal;
+  state.confirmModal = null;
+  if(!m) return;
+  if(m.actionType === 'reset'){
+    data = emptyData();
+    saveData();
+  } else if(m.actionType === 'remove'){
+    data.people = data.people.filter(p => p.id !== m.actionArg);
+    saveData();
+  }
+  render();
+}
+
+function resetAllData(){
+  askConfirm("Clear all people and attendance history for everyone using this link? This can't be undone.", 'reset');
+}
+
+function setGroup(gr){ state.group = gr; state.reportRun = false; render(); }
+function setTab(t){ state.tab = t; if(t !== 'report') state.reportRun = false; render(); }
+function setTakeDate(v){ state.takeDate = v; render(); }
+function setReportDate(v){ state.reportDate = v; state.reportRun = false; render(); }
+function runReport(){ state.reportRun = true; render(); }
+function captureQuickAdd(){
+  const input = document.getElementById('quickAddInput');
+  state.quickAddName = input.value;
+  addQuickPerson();
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+loadData();
+</script>
+</body>
+</html>
